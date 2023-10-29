@@ -1,0 +1,38 @@
+Visualizar datos con un límite de 35 elementos:
+MATCH (n)-[r]-() RETURN n,r LIMIT 35
+
+Libros escritos por un autor especifico (retornado por separado)
+MATCH (autor:Autor {nombre: 'Juan Pérez'})-[:ESCRIBIO]->(libro:Libro)
+RETURN libro.titulo
+
+Libros escritos por un autor especifico (retornado en conjunto)
+MATCH (autor:Autor)-[:ESCRIBIO]->(libro:Libro)
+WHERE autor.nombre = 'Juan Pérez'
+RETURN libro.titulo
+
+Mostrar libros que vende cada tienda y sus respectivos generos:
+MATCH path=(:Libreria)-[:VENDE]->(:Libro)-[:PERTENECE_A]->(:Genero) RETURN path
+
+Mostrar cuantos libros del género fantasia se han vendido por libreria
+MATCH (t:Libreria)-[:REALIZO]->(:Venta)-[c:CONTIENE]->(:Libro)-[:PERTENECE_A]->(:Genero{nombre:"Fantasía"})
+RETURN t.nombre AS NombreTienda ,SUM(c.cantidad) AS LibrosFantasíaVendidos
+
+Obtener el precio de todos los libros según la libreria ordenados de mayor a menor
+MATCH (t:Libreria)-[r:VENDE]->(l:Libro)
+RETURN t.nombre AS Tienda, l.titulo AS Libro, r.precio AS Precio
+ORDER BY r.precio DESC;
+
+Aumentar el precio de todos los libros del género “Fantasía” en la librería “Libros y Más” en 10%
+MATCH (:Libreria {nombre: 'Libros y Más'})-[r:VENDE]->(libro:Libro)-[:PERTENECE_A]->(genero:Genero {nombre: 'Fantasía'})
+SET r.precio = r.precio * 1.10
+RETURN libro.titulo, r.precio;
+
+Eliminar el libro "Órbita desvanecida de la base de datos"
+MATCH (libro:Libro {título:'Órbita desvanecida'})
+DETACH DELETE libro
+
+
+
+
+
+
